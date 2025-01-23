@@ -4,7 +4,7 @@ rm -f build.bas
 i=10
 
 while read line; do
-	line=$(echo $line | xargs)
+	line=$(echo $line | awk '{$1=$1};1')
 	if [[ $line == "" ]]; then continue; fi
 	if echo $line | grep "^rem"; then continue; fi
 	echo "$i $line" >> build.bas
