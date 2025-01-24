@@ -273,6 +273,13 @@ goto mainloop
     goto server 
 
 
+!updatechunk
+    s$="update c set v="+str$(CCV)+" where x="+str$(CCX)+" and y="+str$(CCY)
+    gosub debug
+    @ s$
+    return
+
+
 !padstr
     s$=str$(va)
     !padstr2
