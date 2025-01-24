@@ -174,13 +174,13 @@ goto mainloop
         if pi=256 then CSD$=left$(CSD$,255)+pc$
         if pi>1 and pi<256 then CSD$=left$(CSD$,pi-1)+pc$+right$(CSD$,256-pi)
     next i
-    for y=1 to 16
-    for x=1 to 16
-        i=(y-1)*16+x
+    for yy=1 to 16
+    for xx=1 to 16
+        i=(yy-1)*16+xx
         s$=mid$(CSD$,i,1)
-        if s$<>mid$(PSD$,i,1) then color CSC(i):gosub echo
-    next x
-    next y
+        if s$<>mid$(PSD$,i,1) then color CSC(i):x=xx+1:y=yy+1:gosub echo
+    next xx
+    next yy
     PSD$=CSD$
     rem print status
     color 2
@@ -219,7 +219,8 @@ goto mainloop
 
 !checktimeout
     if TICKS-CCV<20000000 then return
-    @ "update c set s="+str$(USERID)+" where cx="+str$(CCX)+" and cy="+str$(CCY)
+    CCV=TICKS
+    @ "update c set s="+str$(USERID)+",v="+str$(CCV)+" where cx="+str$(CCX)+" and cy="+str$(CCY)
     return
 
 
@@ -273,6 +274,7 @@ goto mainloop
     s$=" "+s$
     goto padstr2
 
+
 !echo
     if LCX<x then right x-LCX
     if LCX>x then left LCX-x
@@ -281,13 +283,4 @@ goto mainloop
     print s$;
     LCX=x+len(s$)
     LCY=y
-    return
-
-!server
-    r$=@ "select id from u where cx="+str$(CX)+" and cy="+str$(CY)
-    id=r$(0,'id')
-    if id<>USERID then SERVE=0:return
-    if SERVE=0 then SERVE=1:STICKS=TICKS:return
-    if TICKS-STICKS<20000000 then return
-    STICKS=TICKS
     return
