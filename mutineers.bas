@@ -212,8 +212,8 @@ goto mainloop
 
 
 !turn
-    FAC=(FAC+m)%4
-    if FAC<0 then FAC=3
+    CFA=(CFA+m)%4
+    if CFA<0 then CFA=3
     goto updateplayer
 
 
@@ -235,7 +235,7 @@ goto mainloop
 
 
 !updateplayer
-    @ "update p set cx="+str$(CCX)+",cy="+str$(CCY)+",lx="+str$(CLX)+",ly="+str$(CLY)+",f="+str$(FAC)+",a=1 where i="+str$(USERID)
+    @ "update p set cx="+str$(CCX)+",cy="+str$(CCY)+",lx="+str$(CLX)+",ly="+str$(CLY)+",f="+str$(CFA)+",a=1 where i="+str$(USERID)
     @ "update c set v="+str$(TICKS)+" where x="+str$(PCX)+" and y="+str$(PCY)
     @ "update c set v="+str$(TICKS)+" where x="+str$(CCX)+" and y="+str$(CCY)
     return
