@@ -117,16 +117,7 @@ goto mainloop
 
     if CCX=PCX and CCY=PCY and CLX=PLX and CLY=PLY and CFA=PFA and CCV=PCV then return
 
-    rem s$=str$(CCX)+" "+str$(PCX)+" "
-    rem s$=s$+str$(CCY)+" "+str$(PCY)+" "
-    rem s$=s$+str$(CLX)+" "+str$(PLX)+" "
-    rem s$=s$+str$(CLY)+" "+str$(PLY)+" "
-    rem s$=s$+str$(CFA)+" "+str$(PFA)+" "
-    rem s$=s$+str$(CCV)+" "+str$(PCV)
-    rem gosub debug
-
     !refresh
-    s$="refresh "+str$(PCV)+"<>"+str$(CCV):gosub debug
     r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
     CCD$=r$(0,'d')
     CSD$=CCD$
@@ -271,20 +262,21 @@ goto mainloop
     if ny<1 then ly=1:cy=cy-1:goto updateplayer
     i=(ny)*16+nx
     c$=mid$(CCD$,i,1)
-    if c$=" " then lx=nx:ly=ny
+    if asc(c$)=32 then lx=nx:ly=ny
     rem TODO: check player collision
     goto updateplayer
 
 
 !updateplayer
-    @ "update p set cx="+str$(cx)+",cy="+str$(cy)+",lx="+str$(lx)+",ly="+str$(ly)+",f="+str$(f)+",a=1 where i="+str$(id)
+    s$="update p set cx="+str$(cx)+",cy="+str$(cy)+",lx="+str$(lx)+",ly="+str$(ly)+",f="+str$(f)+",a=1 where i="+str$(id)
+    gosub debug
+    @ s$
     CCV=TICKS
     goto server 
 
 
 !updatechunk
     s$="update c set v="+str$(CCV)+" where x="+str$(CCX)+" and y="+str$(CCY)
-    gosub debug
     @ s$
     return
 
