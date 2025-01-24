@@ -219,10 +219,10 @@ goto mainloop
 
 !walk
     nx=CLX:ny=CLY
-    if f=0 then ny=CLY-m
-    if f=1 then nx=CLX+m
-    if f=2 then ny=CLY+m
-    if f=3 then nx=CLX-m
+    if CFA=0 then ny=CLY-m
+    if CFA=1 then nx=CLX+m
+    if CFA=2 then ny=CLY+m
+    if CFA=3 then nx=CLX-m
     if nx>16 then CLX=1:CCX=CCX+1:goto updateplayer
     if nx<1 then CLX=16:CCX=CCX-1:goto updateplayer
     if ny>16 then CLY=1:CCY=CCY+1:goto updateplayer
