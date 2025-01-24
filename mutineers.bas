@@ -34,7 +34,7 @@ rem GLOBAL VARIABLES
 
 rem SETUP DATABASE
 
-    DBFILE$="mnz3"
+    DBFILE$="mnz4"
 
     rem Chunk table
     rem x, y - chunk coordinates / identifier
@@ -50,7 +50,7 @@ rem SETUP DATABASE
     rem f - facing
     rem n - name
     rem a - action (0 - offline, 1 - idle, 2 - forward, 3 - backward, 4 - left, 5 - right, 6 - shoot)
-    @ "create table if not exists p(i integer,cx integer,cy integer,lx integer,ly integer,f intger, a integer, n text)"
+    @ "create table if not exists p(i integer,cx integer,cy integer,lx integer,ly integer,f integer,a integer,n text)"
 
     rem Messages table
     rem i - id
