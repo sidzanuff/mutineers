@@ -99,6 +99,7 @@ goto mainloop
 
 
 !checkupdate
+    PACT=ACT
     r$=@ "select cx,cy,lx,ly,f,a from p where i="+str$(USERID)
     if QCOUNT=0 then gosub createplayer:goto checkupdatechunk
     CCX=r$(0,'cx')
@@ -118,7 +119,7 @@ goto mainloop
     if CCX=PCX and CCY=PCY and CLX=PLX and CLY=PLY and CFA=PFA and CCV=PCV then return
 
     !refresh
-    if ACT=1 then x=19:y=1:s$="R":gosub echo
+    if PACT<>ACT and ACT=1 then x=1:y=1:s$="+":gosub echo
     r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
     CCD$=r$(0,'d')
     CSD$=CCD$
