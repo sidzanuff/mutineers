@@ -230,8 +230,8 @@ goto mainloop
 
 !handleplayer
     id=r$(0,'i')
-    cx=r$(0,'cx')
-    cy=r$(0,'cy')
+    cx=CCX
+    cy=CCY
     lx=r$(0,'lx')
     ly=r$(0,'ly')
     f=r$(0,'f')
