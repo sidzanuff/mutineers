@@ -169,7 +169,7 @@ goto mainloop
     CCX=0:CCY=0:CFA=1:ACT=1
     CLX=int(rnd()*16)+1
     CLY=int(rnd()*16)+1
-    s$="insert into p(i,lx,ly,n,cx,cy,f,a) values("+str$(USERID)+","+str$(CLX)+","+str$(CLY)+",'"+USERNAME$+"',0,0,1,1)"
+    s$="insert into p(i,lx,ly,cx,cy,f,a,n) values("+str$(USERID)+","+str$(CLX)+","+str$(CLY)+",0,0,1,1,'"+USERNAME$+"')"
     gosub debug
     @ $s
     return
@@ -294,7 +294,7 @@ goto mainloop
 
 !debug
     if len(s$)<32 then s$=s$+" ": goto debug
-    if len(s$)>32 then s$=left$(s$, 32)
+    rem if len(s$)>32 then s$=left$(s$, 32)
     y=DEY
     x=1
     gosub echo
