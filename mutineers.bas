@@ -207,11 +207,8 @@ goto mainloop
 
 !server
     if SER<>USERID then goto checktimeout
-    r$=@ "select i,lx,ly,f,a from p where l>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
-    for i=1 to QCOUNT
-        a=r$(i-1,'a')
-        if a>1 then gosub handleplayer
-    next i
+    r$=@ "select i,lx,ly,f,a from p where a>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
+    if QCOUNT>0 then goto handleplayer
     if CCV<>PCV then goto updatechunk
     if TICKS-CCV>10000000 then CCV=TICKS:goto updatechunk
     return
@@ -225,18 +222,19 @@ goto mainloop
 
 
 !handleplayer
-    id=r$(i-1,'i')
-    cx=r$(i-1,'cx')
-    cy=r$(i-1,'cy')
-    lx=r$(i-1,'lx')
-    ly=r$(i-1,'ly')
-    f=r$(i-1,'f')
+    id=r$(0,'i')
+    cx=r$(0,'cx')
+    cy=r$(0,'cy')
+    lx=r$(0,'lx')
+    ly=r$(0,'ly')
+    f=r$(0,'f')
+    a=r$(0,'a')
     if a=2 then m=1:goto walk
     if a=3 then m=-1:goto walk
     if a=4 then m=-1:goto turn
     if a=5 then m=1:goto turn
     rem else shoot
-    return
+    goto updateplayer
 
 
 !turn
@@ -256,15 +254,16 @@ goto mainloop
     if ny>16 then ly=1:cy=cy+1:goto updateplayer
     if ny<1 then ly=1:cy=cy-1:goto updateplayer
     i=(ny)*16+nx
-    c$=mid$(CSD$,i,1)
-    if c$=" " then lx=nx:ly=ny:goto updateplayer
-    return
+    c$=mid$(CCD$,i,1)
+    if c$=" " then lx=nx:ly=ny
+    rem TODO: check player collision
+    goto updateplayer
 
 
 !updateplayer
     @ "update p set cx="+str$(cx)+",cy="+str$(cy)+",lx="+str$(lx)+",ly="+str$(ly)+",f="+str$(f)+",a=1 where i="+str$(id)
     CCV=TICKS
-    return 
+    goto server 
 
 
 !padstr
