@@ -34,7 +34,7 @@ rem GLOBAL VARIABLES
 
 rem SETUP DATABASE
 
-    DBFILE$="mz2"
+    DBFILE$="mnz3"
 
     rem Chunk table
     rem x, y - chunk coordinates / identifier
@@ -126,6 +126,7 @@ goto mainloop
         CSC(i)=1
     next i
     r$=@ "select lx,ly,f,i from p where a>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
+    s$="players "+str$(QCOUNT):gosub debug
     for i=1 to QCOUNT
         x=r$(i-1,'lx')
         y=r$(i-1,'ly')
@@ -151,6 +152,7 @@ goto mainloop
     next yy
     PSD$=CSD$
     rem print status
+    s$="print status":gosub debug
     color 2
     x=24:
     if PCX<>CCX then y=3:va=CCX:gosub padstr:gosub echo
@@ -158,6 +160,7 @@ goto mainloop
     if PLX<>CLX then y=5:va=CLX:gosub padstr:gosub echo
     if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
     PCX=CCX:PCY=CCY:CLX=PLX:CLY=PLY:PFA=CFA:PCV=CCV
+    s$="refresh done":gosub debug
     return
 
 
