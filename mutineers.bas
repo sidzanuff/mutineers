@@ -159,7 +159,7 @@ goto mainloop
     if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
     PCX=CCX:PCY=CCY:PLX=CLX:PLY=CLY:PFA=CFA:PCV=CCV
     rem s$="refresh done":gosub debug
-    x=CLX+1:y+CLY+1:gosub locate
+    x=CLX+1:y=CLY+1:gosub locate
     return
 
 
@@ -170,7 +170,7 @@ goto mainloop
     CLY=int(rnd()*16)+1
     s$="insert into p(i,lx,ly,cx,cy,f,a,n) values("+str$(USERID)+","+str$(CLX)+","+str$(CLY)+",0,0,1,1,'"+USERNAME$+"')"
     gosub debug
-    @ $s
+    @ s$
     return
 
 
@@ -294,7 +294,7 @@ goto mainloop
     if LCY<y then down y-LCY
     if LCY>y then up LCY-y
     LCX=x
-    LCX=y
+    LCY=y
     return
 
 
