@@ -116,15 +116,17 @@ goto mainloop
     SER=r$(0,'s')
 
     if CCX=PCX and CCY=PCY and CLX=PLX and CLY=PLY and CFA=PFA and CCV=PCV then return
-    s$=str$(CCX)+" "+str$(PCX)+" "
-    s$=s$+str$(CCY)+" "+str$(PCY)+" "
-    s$=s$+str$(CLX)+" "+str$(PLX)+" "
-    s$=s$+str$(CLY)+" "+str$(PLY)+" "
-    s$=s$+str$(CFA)+" "+str$(PFA)+" "
-    s$=s$+str$(CCV)+" "+str$(PCV)
-    gosub debug
+
+    rem s$=str$(CCX)+" "+str$(PCX)+" "
+    rem s$=s$+str$(CCY)+" "+str$(PCY)+" "
+    rem s$=s$+str$(CLX)+" "+str$(PLX)+" "
+    rem s$=s$+str$(CLY)+" "+str$(PLY)+" "
+    rem s$=s$+str$(CFA)+" "+str$(PFA)+" "
+    rem s$=s$+str$(CCV)+" "+str$(PCV)
+    rem gosub debug
+
     !refresh
-    s$="refresh":gosub debug
+    s$="refresh "+str$(PCV)+"<>"+str$(CCV):gosub debug
     r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
     CCD$=r$(0,'d')
     CSD$=CCD$
@@ -157,7 +159,7 @@ goto mainloop
     next yy
     PSD$=CSD$
     rem print status
-    s$="print status":gosub debug
+    rem s$="print status":gosub debug
     color 2
     x=24:
     if PCX<>CCX then y=3:va=CCX:gosub padstr:gosub echo
@@ -165,7 +167,7 @@ goto mainloop
     if PLX<>CLX then y=5:va=CLX:gosub padstr:gosub echo
     if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
     PCX=CCX:PCY=CCY:PLX=CLX:PLY=CLY:PFA=CFA:PCV=CCV
-    s$="refresh done":gosub debug
+    rem s$="refresh done":gosub debug
     return
 
 
@@ -199,7 +201,9 @@ goto mainloop
 
 
 !updateaction
-    @ "update p set a="+str$(ACT)+" where i="+str$(USERID)
+    s$="update p set a="+str$(ACT)+" where i="+str$(USERID)
+    gosub debug
+    @ s$
     if ACT<>0 then return
     @ "update c set s=-1 where x="+str$(CCX)+" and y="+str$(CCY)
     end
