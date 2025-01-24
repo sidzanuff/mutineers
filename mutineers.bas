@@ -29,7 +29,6 @@ rem GLOBAL VARIABLES
     rem SER - server id
     rem ACT - current action
 
-
     LIT=INKEY:CCV=0:PCX=0:PCY=0:PLX=0:PLY=0:PFA=-1:PCV=0
 
 
@@ -128,7 +127,7 @@ goto mainloop
     @ "update p set a="+str$(ACT)+" where i="+str$(USERID)
     if ACT<>0 then return
     @ "update c set s=-1 where cx="+str$(CCX)+" and cy="+str$(CCY)
-    return
+    end
 
 
 !checkupdate
@@ -194,8 +193,8 @@ goto mainloop
 
 
 !handleinput
-    if LI=INKEY then return
-    k$=INKEY$:li=INKEY
+    if LIT=INKEY then return
+    k$=INKEY$:LIT=INKEY
     if k$="q" then ACT=0
     if ACT>1 then return
     if k$="a" then ACT=4
