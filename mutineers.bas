@@ -120,7 +120,7 @@ goto mainloop
     !refresh
     s$="refresh":gosub debug
     r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
-    CCD$=r(0,'d')
+    CCD$=r$(0,'d')
     CSD$=CCD$
     for i=1 to 256
         CSC(i)=1
