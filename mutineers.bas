@@ -94,7 +94,7 @@ rem SETUP SCREEN
 !mainloop
     gosub checkupdate
     gosub handleinput
-    gosub server
+    PCX=CCX:PCY=CCY:PLX=CLX:PLY=CLY:PFA=CFA:PCV=CCV
 goto mainloop
 
 
@@ -157,7 +157,6 @@ goto mainloop
     if PCY<>CCY then y=4:va=CCY:gosub padstr:gosub echo
     if PLX<>CLX then y=5:va=CLX:gosub padstr:gosub echo
     if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
-    PCX=CCX:PCY=CCY:PLX=CLX:PLY=CLY:PFA=CFA:PCV=CCV
     rem s$="refresh done":gosub debug
     x=CLX+1:y=CLY+1:gosub locate
     return
@@ -203,80 +202,42 @@ goto mainloop
 !handleinput
     if LIT=INKEY then return
     k$=INKEY$:LIT=INKEY
-    if k$="q" then ACT=0
+    if k$="q" then ACT=0:goto updateaction
     if ACT>1 then return
-    if k$="a" then ACT=4
-    if k$="d" then ACT=5
-    if k$="w" then ACT=2
-    if k$="s" then ACT=3
-    goto updateaction
-
-
-!server
-    if SER<>USERID then goto checktimeout
-    r$=@ "select i,lx,ly,f,a from p where a>1 and cx="+str$(CCX)+" and cy="+str$(CCY)
-    if QCOUNT>0 then goto handleplayer
-    if CCV<>PCV then goto updatechunk
-    if TICKS-CCV>10000000 then CCV=TICKS:goto updatechunk
+    if k$="a" then m=1:goto walk
+    if k$="d" then m=-1:goto walk
+    if k$="w" then m=-1:goto turn
+    if k$="s" then m=1:goto turn
     return
-
-
-!checktimeout
-    if TICKS-CCV<20000000 then return
-    CCV=TICKS
-    @ "update c set s="+str$(USERID)+",v="+str$(CCV)+" where x="+str$(CCX)+" and y="+str$(CCY)
-    return
-
-
-!handleplayer
-    id=r$(0,'i')
-    cx=CCX
-    cy=CCY
-    lx=r$(0,'lx')
-    ly=r$(0,'ly')
-    f=r$(0,'f')
-    a=r$(0,'a')
-    if a=2 then m=1:goto walk
-    if a=3 then m=-1:goto walk
-    if a=4 then m=-1:goto turn
-    if a=5 then m=1:goto turn
-    rem else shoot
-    goto updateplayer
 
 
 !turn
-    f=(f+m)%4
-    if f<0 then f=3
+    FAC=(FAC+m)%4
+    if FAC<0 then FAC=3
     goto updateplayer
 
 
 !walk
-    nx=lx:ny=ly
-    if f=0 then ny=ly-m
-    if f=1 then nx=lx+m
-    if f=2 then ny=ly+m
-    if f=3 then nx=lx-m
-    if nx>16 then lx=1:cx=cx+1:goto updateplayer
-    if nx<1 then lx=16:cx=cx-1:goto updateplayer
-    if ny>16 then ly=1:cy=cy+1:goto updateplayer
-    if ny<1 then ly=16:cy=cy-1:goto updateplayer
+    nx=CLX:ny=CLY
+    if f=0 then ny=CLY-m
+    if f=1 then nx=CLX+m
+    if f=2 then ny=CLY+m
+    if f=3 then nx=CLX-m
+    if nx>16 then CLX=1:CCX=CCX+1:goto updateplayer
+    if nx<1 then CLX=16:CCX=CCX-1:goto updateplayer
+    if ny>16 then CLY=1:CCY=CCY+1:goto updateplayer
+    if ny<1 then CLY=16:CCY=CCY-1:goto updateplayer
     i=(ny-1)*16+nx
     c$=mid$(CCD$,i,1)
-    if asc(c$)=32 then lx=nx:ly=ny
+    if asc(c$)=32 then CLX=nx:CLY=ny
     rem TODO: check player collision
     goto updateplayer
 
 
 !updateplayer
-    s$="update p set cx="+str$(cx)+",cy="+str$(cy)+",lx="+str$(lx)+",ly="+str$(ly)+",f="+str$(f)+",a=1 where i="+str$(id)
-    @ s$
-    CCV=TICKS
-    goto server 
-
-
-!updatechunk
-    s$="update c set v="+str$(CCV)+" where x="+str$(CCX)+" and y="+str$(CCY)
-    @ s$
+    @ "update p set cx="+str$(CCX)+",cy="+str$(CCY)+",lx="+str$(CLX)+",ly="+str$(CLY)+",f="+str$(FAC)+",a=1 where i="+str$(USERID)
+    @ "update c set v="+str$(TICKS)+" where x="+str$(PCX)+" and y="+str$(PCY)
+    @ "update c set v="+str$(TICKS)+" where x="+str$(CCX)+" and y="+str$(CCY)
     return
 
 
