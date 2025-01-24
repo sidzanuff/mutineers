@@ -204,10 +204,10 @@ goto mainloop
     k$=INKEY$:LIT=INKEY
     if k$="q" then ACT=0:goto updateaction
     if ACT>1 then return
-    if k$="a" then m=1:goto walk
-    if k$="d" then m=-1:goto walk
-    if k$="w" then m=-1:goto turn
-    if k$="s" then m=1:goto turn
+    if k$="w" then m=1:goto walk
+    if k$="s" then m=-1:goto walk
+    if k$="a" then m=-1:goto turn
+    if k$="d" then m=1:goto turn
     return
 
 
