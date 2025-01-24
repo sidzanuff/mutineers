@@ -193,7 +193,6 @@ goto mainloop
 
 !updateaction
     s$="update p set a="+str$(ACT)+" where i="+str$(USERID)
-    gosub debug
     @ s$
     if ACT<>0 then return
     @ "update c set s=-1 where x="+str$(CCX)+" and y="+str$(CCY)
@@ -260,7 +259,7 @@ goto mainloop
     if nx<1 then lx=16:cx=cx-1:goto updateplayer
     if ny>16 then ly=1:cy=cy+1:goto updateplayer
     if ny<1 then ly=1:cy=cy-1:goto updateplayer
-    i=(ny)*16+nx
+    i=(ny-1)*16+nx
     c$=mid$(CCD$,i,1)
     if asc(c$)=32 then lx=nx:ly=ny
     rem TODO: check player collision
@@ -269,7 +268,6 @@ goto mainloop
 
 !updateplayer
     s$="update p set cx="+str$(cx)+",cy="+str$(cy)+",lx="+str$(lx)+",ly="+str$(ly)+",f="+str$(f)+",a=1 where i="+str$(id)
-    gosub debug
     @ s$
     CCV=TICKS
     goto server 
