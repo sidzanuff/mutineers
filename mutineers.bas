@@ -15,13 +15,41 @@ rem LCX - last cursor x
 rem LCY - last cursor y
 
 cls
+rem     1234567890123456
+print "+----------------+"
+print "|                | +------+"
+print "|                | |CX:   |"
+print "|                | |CY:   |"
+print "|                | |LX:   |"
+print "|                | |LY:   |"
+print "|                | +------+"
+print "|                |"
+print "|                |"
+print "|                |"
+print "|                |"
+print "|                |"
+print "|                |"
+print "|                |"
+print "|                |"
+print "|                |"
+print "|                |"
+print "+----------------+"
+home
+
+LCX=1
+LCY=1
+
+x=24
+y=3:va=-28:gosub padstr:gosub echo
+y=4:va=129:gosub padstr:gosub echo
+y=5:va=19:gosub padstr:gosub echo
+y=6:va=1:gosub padstr:gosub echo
+x=1:y=19:s$="test":gosub echo
+end
 
 DBFILE$="mz"
 LI=INKEY
 SERVE=0
-
-LCX=1
-LCY=1
 
 for i=1 to 256
     SP$=SP$+" "
@@ -88,7 +116,7 @@ goto mainloop
     goto render
 
 !handleinput
-    if li=INKEY then return
+    if LI=INKEY then return
     k$=INKEY$
     li=INKEY
     pcx=cx:pcy=cy
