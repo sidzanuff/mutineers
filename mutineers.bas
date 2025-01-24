@@ -118,6 +118,7 @@ goto mainloop
     if CCX=PCX and CCY=PCY and CLX=PLX and CLY=PLY and CFA=PFA and CCV=PCV then return
 
     !refresh
+    if ACT=1 then x=19:y=1:s$="R":gosub echo
     r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
     CCD$=r$(0,'d')
     CSD$=CCD$
@@ -208,6 +209,7 @@ goto mainloop
     if k$="d" then ACT=5
     if k$="w" then ACT=2
     if k$="s" then ACT=3
+    x=19:y=1:s$="W":gosub echo
     goto updateaction
 
 
@@ -258,7 +260,7 @@ goto mainloop
     if nx>16 then lx=1:cx=cx+1:goto updateplayer
     if nx<1 then lx=16:cx=cx-1:goto updateplayer
     if ny>16 then ly=1:cy=cy+1:goto updateplayer
-    if ny<1 then ly=1:cy=cy-1:goto updateplayer
+    if ny<1 then ly=16:cy=cy-1:goto updateplayer
     i=(ny-1)*16+nx
     c$=mid$(CCD$,i,1)
     if asc(c$)=32 then lx=nx:ly=ny
