@@ -116,7 +116,13 @@ goto mainloop
     SER=r$(0,'s')
 
     if CCX=PCX and CCY=PCY and CLX=PLX and CLY=PLY and CFA=PFA and CCV=PCV then return
-
+    s$=str$(CCX)+" "+str$(PCX)+" "
+    s$=s$+str$(CCY)+" "+str$(PCY)+" "
+    s$=s$+str$(CLX)+" "+str$(PLX)+" "
+    s$=s$+str$(CLY)+" "+str$(PLY)+" "
+    s$=s$+str$(CFA)+" "+str$(PFA)+" "
+    s$=s$+str$(CCV)+" "+str$(PCV)
+    gosub debug
     !refresh
     s$="refresh":gosub debug
     r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
@@ -223,7 +229,7 @@ goto mainloop
 !checktimeout
     if TICKS-CCV<20000000 then return
     CCV=TICKS
-    @ "update c set s="+str$(USERID)+",v="+str$(CCV)+" where cx="+str$(CCX)+" and cy="+str$(CCY)
+    @ "update c set s="+str$(USERID)+",v="+str$(CCV)+" where x="+str$(CCX)+" and y="+str$(CCY)
     return
 
 
