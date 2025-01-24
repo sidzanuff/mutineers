@@ -169,7 +169,9 @@ goto mainloop
     CCX=0:CCY=0:CFA=1:ACT=1
     CLX=int(rnd()*16)+1
     CLY=int(rnd()*16)+1
-    @ "insert into p(i,lx,ly,n,cx,cy,f,a) values("+str$(USERID)+","+str$(CLX)+","+str$(CLY)+",'"+USERNAME$+"',0,0,1,1)"
+    s$="insert into p(i,lx,ly,n,cx,cy,f,a) values("+str$(USERID)+","+str$(CLX)+","+str$(CLY)+",'"+USERNAME$+"',0,0,1,1)"
+    gosub debug
+    @ $s
     return
 
 
