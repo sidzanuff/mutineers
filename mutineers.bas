@@ -99,7 +99,6 @@ goto mainloop
 
 
 !checkupdate
-    PACT=ACT
     r$=@ "select cx,cy,lx,ly,f,a from p where i="+str$(USERID)
     if QCOUNT=0 then gosub createplayer:goto checkupdatechunk
     CCX=r$(0,'cx')
@@ -119,7 +118,6 @@ goto mainloop
     if CCX=PCX and CCY=PCY and CLX=PLX and CLY=PLY and CFA=PFA and CCV=PCV then return
 
     !refresh
-    if PACT<>ACT and ACT=1 then x=1:y=1:s$="+":gosub echo
     r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
     CCD$=r$(0,'d')
     CSD$=CCD$
@@ -161,6 +159,7 @@ goto mainloop
     if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
     PCX=CCX:PCY=CCY:PLX=CLX:PLY=CLY:PFA=CFA:PCV=CCV
     rem s$="refresh done":gosub debug
+    x=CLX+1:y+CLY+1:gosub locate
     return
 
 
@@ -210,7 +209,6 @@ goto mainloop
     if k$="d" then ACT=5
     if k$="w" then ACT=2
     if k$="s" then ACT=3
-    x=19:y=1:s$="W":gosub echo
     goto updateaction
 
 
@@ -290,14 +288,20 @@ goto mainloop
     goto padstr2
 
 
-!echo
+!locate
     if LCX<x then right x-LCX
     if LCX>x then left LCX-x
     if LCY<y then down y-LCY
     if LCY>y then up LCY-y
+    LCX=x
+    LCX=y
+    return
+
+
+!echo
+    gosub locate
     print s$;
-    LCX=x+len(s$)
-    LCY=y
+    LCX=LCX+len(s$)
     return
 
 
