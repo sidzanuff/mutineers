@@ -1,66 +1,96 @@
-rem Global variables:
-rem
-rem LI - last input time
-rem CX - chunk x
-rem CY - chunk y
-rem CV - chunk version
-rem CD - chunk data
-rem LX - local x
-rem LY - local y
-rem F  - directon
-rem SP - previous screen data
-rem SD - current screen data
-rem SC - screen colors
-rem LCX - last cursor x
-rem LCY - last cursor y
+rem NOTES
 
-cls:home
-rem     1234567890123456
-print "+----------------+"
-print "|                | +------+"
-print "|                | |CX:   |"
-print "|                | |CY:   |"
-print "|                | |LX:   |"
-print "|                | |LY:   |"
-print "|                | +------+"
-print "|                |"
-print "|                |"
-print "|                |"
-print "|                |"
-print "|                |"
-print "|                |"
-print "|                |"
-print "|                |"
-print "|                |"
-print "|                |"
-print "+----------------+"
-home
+    rem TICKS to second
+    rem s=TICKS/10000000
 
-LCX=1
-LCY=1
 
-x=24
-y=3:va=-28:gosub padstr:gosub echo
-y=4:va=129:gosub padstr:gosub echo
-y=5:va=19:gosub padstr:gosub echo
-y=6:va=1:gosub padstr:gosub echo
-x=1:y=19:s$="test":gosub echo
-end
+rem GLOBAL VARIABLES
 
-DBFILE$="mz"
-LI=INKEY
-SERVE=0
+    rem
+    rem LIT - last input time
+    rem CCX - current chunk x
+    rem CCY - current chunk y
+    rem PCX - prevous chunk x
+    rem PCY - prevous chunk y
+    rem CCV - chunk version
+    rem PCV - previous chunk verson
+    rem CCD - chunk data
+    rem CLX - local x
+    rem CLY - local y
+    rem PLX - previous loxal x
+    rem PLY - previous local y
+    rem CFA - current facing
+    rem PFA - previous facing
+    rem PSD - previous screen data
+    rem CSD - current screen data
+    rem CSC - screen colors
+    rem LCX - last cursor x
+    rem LCY - last cursor y
+    rem SER - server id
+    rem ACT - current action
 
-for i=1 to 256
-    SP$=SP$+" "
-next i
 
-@ "create table if not exists c(x integer,y integer,v integer, d text)"
-@ "create table if not exists p(id integer,cx integer,cy integer,lx integer,ly integer,f intger, l integer)"
+    LIT=INKEY:CCV=0:PCX=0:PCY=0:PLX=0:PLY=0:PFA=-1:PCV=0
 
-gosub loadplayer
-@ "update p set l=1 where id="+str$(USERID)
-gosub loadchunk
+
+rem SETUP DATABASE
+
+    DBFILE$="mz2"
+
+    rem Chunk table
+    rem x, y - chunk coordinates / identifier
+    rem v - last chunk update in ticks
+    rem d - chunk data 16*16 characters
+    rem s - server player id
+    @ "create table if not exists c(x integer,y integer,v integer,d text,s integer)"
+
+    rem Players table
+    rem i - id
+    rem cx,cy - chunk coordinates
+    rem lx,ly - local coordinates
+    rem f - facing
+    rem n - name
+    rem a - action (0 - offline, 1 - idle, 2 - forward, 3 - backward, 4 - left, 5 - right, 6 - shoot)
+    @ "create table if not exists p(i integer,cx integer,cy integer,lx integer,ly integer,f intger, a integer, n text)"
+
+    rem Messages table
+    rem i - id
+    rem t - text
+    @ "create table if not exists m(i integer primary key, t text)"
+
+
+rem SETUP SCREEN
+
+    color 2
+    cls:home
+    rem    123456789012345678901234
+    print "+----------------+"
+    print "|                | +------+"
+    print "|                | |CX:  0|"
+    print "|                | |CY:  0|"
+    print "|                | |LX:  0|"
+    print "|                | |LY:  0|"
+    print "|                | +------+"
+    print "|                |"
+    print "|                |"
+    print "|                |"
+    print "|                |"
+    print "|                |"
+    print "|                |"
+    print "|                |"
+    print "|                |"
+    print "|                |"
+    print "|                |"
+    print "+----------------+"
+    home
+
+    LCX=1:LCY=1:PCX=0:PCY=0:PLX=0:PLY=0
+
+    PSD$=""
+    for i=1 to 256
+        PSD$=PSD$+" "
+    next i
+
 
 !mainloop
     gosub checkupdate
@@ -68,150 +98,173 @@ gosub loadchunk
     gosub server
 goto mainloop
 
-!loadplayer
-    r$=@ "select * from u where id="+str$(USERID)
-    if QCOUNT<1 then goto createplayer
-    CX=r$(0,'cx')
-    CY=r$(0,'cy')
-    LX=r$(0,'lx')
-    LY=r$(0,'ly')
-    F=r$(0,'f')
-    return
 
 !createplayer
-    LX=int(rnd()*16)+1
-    LY=int(rnd()*16)+1
-    CX=0:CY=0:F=1
-    @ "insert into p(id,lx,ly,cx,cy,f) values("+str$(USERID)+","+str$(LX)+","+str$(LY)+","+"0,0,0)"
+    CCX=0:CCY=0:CFA=1:ACT=1
+    CLX=int(rnd()*16)+1
+    CLY=int(rnd()*16)+1
+    @ "insert into p(i,lx,ly,n,cx,cy,f,a) values("+str$(USERID)+","+str$(CLX)+","+str$(CLY)+",'"+USERNAME$+"',0,0,1,1)"
     return
 
-!loadchunk
-    r$=@ "select * from c where x="+str$(cx)+" and y="+str$(cy)
-    if QCOUNT<1 then goto createchunk
-    CD$=r$(0,'d')
-    CV=r$(0,'v')
-    goto render
 
 !createchunk
-    pi=(LY-1)*16+LX
-    CD$=""
-    for i=1 to 256
+    pi=(CLY-1)*16+CLX
+    CCD$=""
+    for y=1 to 16
+    for x=1 to 16
+        i=(y-1)*16+x
         c$=" "
-        if i<>pi and rnd()<.25 then c$="#"
-        CD$=CD$+c$
-    next i
-    CV=0
-    @ "insert into c(x,y,d,v) values("+str$(CX)+","+str$(CY)+",'"+CD$+"',0)"
-    goto render
+        if x>1 and x<16 and y>1 and y<16 and i<>pi and rnd()<.25 then c$="#"
+        CCD$=CCD$+c$
+    next x
+    next y
+    CCV=TICKS
+    SER=USERID
+    @ "insert into c(x,y,d,v,s) values("+str$(CCX)+","+str$(CCY)+",'"+CCD$+"',"+str$(CCV)+","+str$(SER)")"
+    return
+
+
+!updateaction
+    @ "update p set a="+str$(ACT)+" where i="+str$(USERID)
+    if ACT<>0 then return
+    @ "update c set s=-1 where cx="+str$(CCX)+" and cy="+str$(CCY)
+    return
+
 
 !checkupdate
-    q$="from c where x="+str$(CX)+" and y="+str$(CY`)
-    r$=@ "select v "+q$
-    if QCOUNT<1 then goto createchunk
-    v=r$(0,'v')
-    if v=CV then return
-    CV=v
-    r$=@ "select d "+q$
-    CD$=r$(0,'d')
-    goto render
+    r$=@ "select cx,cy,lx,ly,f,a from p where i="+str$(USERID)
+    if QCOUNT=0 then gosub createplayer:goto checkupdatechunk
+    CCX=r$(0,'cx')
+    CCY=r$(0,'cy')
+    CLX=r$(0,'lx')
+    CLY=r$(0,'ly')
+    CFA=r$(0,'f')
+    ACT=r$(0,'a')
+    if ACT=0 then ACT=1:gosub updateaction
 
-!handleinput
-    if LI=INKEY then return
-    k$=INKEY$
-    li=INKEY
-    pcx=cx:pcy=cy
-    if k$="q" then goto signout
-    if k$="a" then f=(f-1)%4
-    if k$="d" then f=(f+1)%4
-    if f<0 then f=3
-    if k$="w" then d=1:gosub walk
-    if k$="s" then d=-1:gosub walk
-    gosub updateplayer
-    if pcx<>cx or pcy<>cy then gosub updatechunk
-    pcx=cx:pcy=cy
-    gosub updatechunk
-    gosub loadchunk
-    return
+    !checkupdatechunk
+    r$=@ "select v,s from c where x="+str$(CCX)+" and y="str$(CCY)
+    if QCOUNT=0 then gosub createchunk:goto refresh
+    CCV=r$(0,'v')
+    SER=r$(0,'s')
 
-!walk
-    nlx=lx:nly=ly
-    if f=0 then nly=ly-d
-    if f=1 then nlx=lx+d
-    if f=2 then nly=ly+d
-    if f=3 then nlx=lx-d
-    if nlx>16 then lx=1:cx=cx+1:return
-    if nlx<1 then lx=16:cx=cx-1:return
-    if nly<1 then ly=16:cy=cy-1:return
-    if nly>16 then ly=1:cy=cy+1:return
-    i=(nly-1)*16+nlx
-    cc$=mid$(cd$,i,1)
-    if asc(cc$)=32 then goto dowalk
-    return
-    !dowalk
-    lx=nlx:ly=nly
-    return
+    if CCX=PCX and CCY=PCY and CLX=PLX and CLY=PLY and CFA=PFA and CCV=PCV then return
 
-!signout
-    @ "update u set l=0 where id="+str$(USERID)
-    gosub updatechunk
-    end
-
-!updatechunk
-    s$="update c set v="+str$(cv)+" where x="
-    s$=s$+str$(pcx)+" and y="
-    s$=s$+str$(pcy)
-    @ s$
-    return
-
-!updateplayer
-    s$="update u set lx="
-    s$=s$+str$(lx)+", ly="
-    s$=s$+str$(ly)+", cx="
-    s$=s$+str$(cx)+", cy="
-    s$=s$+str$(cy)+", f="
-    s$=s$+str$(f)+" where id="
-    s$=s$+str$(USERID)
-    @ s$
-    return
-
-!render
-    SD$=CD$
+    !refresh
+    r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
+    CCD$=r(0,'d')
+    CSD$=CCD$
     for i=1 to 256
-        SC(i)=1
+        CSC(i)=1
     next i
-    r$=@ "select lx,ly,f,id from p where l=1 and cx="+str$(CX)+" and cy="+str$(CY)
+    r$=@ "select lx,ly,f,i from p where l>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
     for i=1 to QCOUNT
         x=r$(i-1,'lx')
         y=r$(i-1,'ly')
         pf=r$(i-1,'f')
-        pid=r$(i-1,'id')
+        pid=r$(i-1,'i')
         if pf=0 then pc$="A"
         if pf=1 then pc$=">"
         if pf=2 then pc$="V"
         if pf=3 then pc$="<"
         pi=(y-1)*16+x
-        if pid=USERID then SC(pi)=2
-        if pid<>USERID then SC(pi)=4
-        if pi=1 then SD$=pc$+right$(SD$,255)
-        if pi=256 then SD$=left$(SD$,255)+pc$
-        if pi>1 and pi<256 then SD$=left$(SD$,pi-1)+pc$+right$(SD$,256-pi)
+        if pid=USERID then CSC(pi)=2
+        if pid<>USERID then CSC(pi)=4
+        if pi=1 then CSD$=pc$+right$(CSD$,255)
+        if pi=256 then CSD$=left$(CSD$,255)+pc$
+        if pi>1 and pi<256 then CSD$=left$(CSD$,pi-1)+pc$+right$(CSD$,256-pi)
     next i
     for y=1 to 16
     for x=1 to 16
         i=(y-1)*16+x
-        s$=mid$(SD$,i,1)
-        if s$<>mid$(SP$,i,1) then color SC(i):gosub echo
+        s$=mid$(CSD$,i,1)
+        if s$<>mid$(PSD$,i,1) then color CSC(i):gosub echo
     next x
     next y
-    SP$=SD$
+    PSD$=CSD$
     rem print status
     color 2
-    x=18:
-    y=1:va=CX:gosub padstr:s$="CX:"+s$:gosub echo
-    y=2:va=CY:gosub padstr:s$="CY:"+s$:gosub echo
-    y=3:va=LX:gosub padstr:s$="LX:"+s$:gosub echo
-    y=4:va=LY:gosub padstr:s$="LY:"+s$:gosub echo
+    x=24:
+    if PCX<>CCX then y=3:va=CCX:gosub padstr:gosub echo
+    if PCY<>CCY then y=4:va=CCY:gosub padstr:gosub echo
+    if PLX<>CLX then y=5:va=CLX:gosub padstr:gosub echo
+    if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
+    PCX=CCX:PCY=CCY:CLX=PLX:CLY=PLY:PFA=CFA:PCV=CCV
     return
+
+
+!handleinput
+    if LI=INKEY then return
+    k$=INKEY$:li=INKEY
+    if k$="q" then ACT=0
+    if ACT>1 then return
+    if k$="a" then ACT=4
+    if k$="d" then ACT=5
+    if k$="w" then ACT=2
+    if k$="s" then ACT=3
+    goto updateaction
+
+
+!server
+    if SER<>USERID then goto checktimeout
+    r$=@ "select i,lx,ly,f,a from p where l>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
+    for i=1 to QCOUNT
+        a=r$(i-1,'a')
+        if a>1 then gosub handleplayer
+    next i
+    if CCV<>PCV then goto updatechunk
+    if TICKS-CCV>10000000 then CCV=TICKS:goto updatechunk
+    return
+
+
+!checktimeout
+    if TICKS-CCV<20000000 then return
+    @ "update c set s="+str$(USERID)+" where cx="+str$(CCX)+" and cy="+str$(CCY)
+    return
+
+
+!handleplayer
+    id=r$(i-1,'i')
+    cx=r$(i-1,'cx')
+    cy=r$(i-1,'cy')
+    lx=r$(i-1,'lx')
+    ly=r$(i-1,'ly')
+    f=r$(i-1,'f')
+    if a=2 then m=1:goto walk
+    if a=3 then m=-1:goto walk
+    if a=4 then m=-1:goto turn
+    if a=5 then m=1:goto turn
+    rem else shoot
+    return
+
+
+!turn
+    f=(f+m)%4
+    if f<0 then f=3
+    goto updateplayer
+
+
+!walk
+    nx=lx:ny=ly
+    if f=0 then ny=ly-m
+    if f=1 then nx=lx+m
+    if f=2 then ny=ly+m
+    if f=3 then nx=lx-m
+    if nx>16 then lx=1:cx=cx+1:goto updateplayer
+    if nx<1 then lx=16:cx=cx-1:goto updateplayer
+    if ny>16 then ly=1:cy=cy+1:goto updateplayer
+    if ny<1 then ly=1:cy=cy-1:goto updateplayer
+    i=(ny)*16+nx
+    c$=mid$(CSD$,i,1)
+    if c$=" " then lx=nx:ly=ny:goto updateplayer
+    return
+
+
+!updateplayer
+    @ "update p set cx="+str$(cx)+",cy="+str$(cy)+",lx="+str$(lx)+",ly="+str$(ly)+",f="+str$(f)+",a=1 where i="+str$(id)
+    CCV=TICKS
+    return 
+
 
 !padstr
     s$=str$(va)
