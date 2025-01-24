@@ -90,10 +90,10 @@ rem SETUP SCREEN
         PSD$=PSD$+" "
     next i
 
-
+gosub checkupdate
 !mainloop
-    gosub checkupdate
     gosub handleinput
+    gosub checkupdate
     PCX=CCX:PCY=CCY:PLX=CLX:PLY=CLY:PFA=CFA:PCV=CCV
 goto mainloop
 
@@ -158,7 +158,7 @@ goto mainloop
     if PLX<>CLX then y=5:va=CLX:gosub padstr:gosub echo
     if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
     rem s$="refresh done":gosub debug
-    x=CLX+1:y=CLY+1:gosub locate
+    rem x=CLX+1:y=CLY+1:gosub locate
     return
 
 
