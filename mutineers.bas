@@ -29,7 +29,7 @@ rem GLOBAL VARIABLES
     rem SER - server id
     rem ACT - current action
 
-    LIT=INKEY:CCV=0:PCX=0:PCY=0:PLX=0:PLY=0:PFA=-1:PCV=0
+    LIT=INKEY:CCV=0:PCX=0:PCY=0:PLX=0:PLY=0:PFA=-1:PCV=0:DEY=19
 
 
 rem SETUP DATABASE
@@ -98,38 +98,6 @@ rem SETUP SCREEN
 goto mainloop
 
 
-!createplayer
-    CCX=0:CCY=0:CFA=1:ACT=1
-    CLX=int(rnd()*16)+1
-    CLY=int(rnd()*16)+1
-    @ "insert into p(i,lx,ly,n,cx,cy,f,a) values("+str$(USERID)+","+str$(CLX)+","+str$(CLY)+",'"+USERNAME$+"',0,0,1,1)"
-    return
-
-
-!createchunk
-    pi=(CLY-1)*16+CLX
-    CCD$=""
-    for y=1 to 16
-    for x=1 to 16
-        i=(y-1)*16+x
-        c$=" "
-        if x>1 and x<16 and y>1 and y<16 and i<>pi and rnd()<.25 then c$="#"
-        CCD$=CCD$+c$
-    next x
-    next y
-    CCV=TICKS
-    SER=USERID
-    @ "insert into c(x,y,d,v,s) values("+str$(CCX)+","+str$(CCY)+",'"+CCD$+"',"+str$(CCV)+","+str$(SER)")"
-    return
-
-
-!updateaction
-    @ "update p set a="+str$(ACT)+" where i="+str$(USERID)
-    if ACT<>0 then return
-    @ "update c set s=-1 where cx="+str$(CCX)+" and cy="+str$(CCY)
-    end
-
-
 !checkupdate
     r$=@ "select cx,cy,lx,ly,f,a from p where i="+str$(USERID)
     if QCOUNT=0 then gosub createplayer:goto checkupdatechunk
@@ -150,6 +118,7 @@ goto mainloop
     if CCX=PCX and CCY=PCY and CLX=PLX and CLY=PLY and CFA=PFA and CCV=PCV then return
 
     !refresh
+    s$="refresh":gosub debug
     r$=@ "select d from c where x="+str$(CCX)+" and y="str$(CCY)
     CCD$=r(0,'d')
     CSD$=CCD$
@@ -190,6 +159,40 @@ goto mainloop
     if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
     PCX=CCX:PCY=CCY:CLX=PLX:CLY=PLY:PFA=CFA:PCV=CCV
     return
+
+
+!createplayer
+    s$="createplayer":gosub debug
+    CCX=0:CCY=0:CFA=1:ACT=1
+    CLX=int(rnd()*16)+1
+    CLY=int(rnd()*16)+1
+    @ "insert into p(i,lx,ly,n,cx,cy,f,a) values("+str$(USERID)+","+str$(CLX)+","+str$(CLY)+",'"+USERNAME$+"',0,0,1,1)"
+    return
+
+
+!createchunk
+    s$="createchunk":gosub debug
+    pi=(CLY-1)*16+CLX
+    CCD$=""
+    for y=1 to 16
+    for x=1 to 16
+        i=(y-1)*16+x
+        c$=" "
+        if x>1 and x<16 and y>1 and y<16 and i<>pi and rnd()<.25 then c$="#"
+        CCD$=CCD$+c$
+    next x
+    next y
+    CCV=TICKS
+    SER=USERID
+    @ "insert into c(x,y,d,v,s) values("+str$(CCX)+","+str$(CCY)+",'"+CCD$+"',"+str$(CCV)+","+str$(SER)")"
+    return
+
+
+!updateaction
+    @ "update p set a="+str$(ACT)+" where i="+str$(USERID)
+    if ACT<>0 then return
+    @ "update c set s=-1 where cx="+str$(CCX)+" and cy="+str$(CCY)
+    end
 
 
 !handleinput
@@ -281,4 +284,15 @@ goto mainloop
     print s$;
     LCX=x+len(s$)
     LCY=y
+    return
+
+
+!debug
+    if len(s$)<32 then s$=s$+" ": goto debug
+    if len(s$)>32 then s$=left$(s$, 32)
+    y=DEY
+    x=1
+    gosub echo
+    DEY=DEY+1
+    if DEY>24 then DEY=19
     return
