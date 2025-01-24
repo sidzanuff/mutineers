@@ -157,7 +157,7 @@ goto mainloop
     for i=1 to 256
         CSC(i)=1
     next i
-    r$=@ "select lx,ly,f,i from p where l>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
+    r$=@ "select lx,ly,f,i from p where a>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
     for i=1 to QCOUNT
         x=r$(i-1,'lx')
         y=r$(i-1,'ly')
