@@ -126,7 +126,6 @@ goto mainloop
         CSC(i)=1
     next i
     r$=@ "select lx,ly,f,i from p where a>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
-    s$="players "+str$(QCOUNT):gosub debug
     for i=1 to QCOUNT
         x=r$(i-1,'lx')
         y=r$(i-1,'ly')
@@ -159,7 +158,7 @@ goto mainloop
     if PCY<>CCY then y=4:va=CCY:gosub padstr:gosub echo
     if PLX<>CLX then y=5:va=CLX:gosub padstr:gosub echo
     if PLY<>CLY then y=6:va=CLY:gosub padstr:gosub echo
-    PCX=CCX:PCY=CCY:CLX=PLX:CLY=PLY:PFA=CFA:PCV=CCV
+    PCX=CCX:PCY=CCY:PLX=CLX:PLY=CLY:PFA=CFA:PCV=CCV
     s$="refresh done":gosub debug
     return
 
@@ -196,7 +195,7 @@ goto mainloop
 !updateaction
     @ "update p set a="+str$(ACT)+" where i="+str$(USERID)
     if ACT<>0 then return
-    @ "update c set s=-1 where cx="+str$(CCX)+" and cy="+str$(CCY)
+    @ "update c set s=-1 where x="+str$(CCX)+" and y="+str$(CCY)
     end
 
 
@@ -214,7 +213,7 @@ goto mainloop
 
 !server
     if SER<>USERID then goto checktimeout
-    r$=@ "select i,lx,ly,f,a from p where a>0 and cx="+str$(CCX)+" and cy="+str$(CCY)
+    r$=@ "select i,lx,ly,f,a from p where a>1 and cx="+str$(CCX)+" and cy="+str$(CCY)
     if QCOUNT>0 then goto handleplayer
     if CCV<>PCV then goto updatechunk
     if TICKS-CCV>10000000 then CCV=TICKS:goto updatechunk
