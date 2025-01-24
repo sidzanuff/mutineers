@@ -14,7 +14,7 @@ rem SC - screen colors
 rem LCX - last cursor x
 rem LCY - last cursor y
 
-cls
+cls:home
 rem     1234567890123456
 print "+----------------+"
 print "|                | +------+"
